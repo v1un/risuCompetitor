@@ -1,0 +1,26 @@
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, they will be requested for
+# review when someone opens a pull request.
+* @project-admin
+
+# Core application files
+/src/main/ @backend-team
+/src/renderer/ @frontend-team
+
+# AI integration
+/src/main/services/ai/ @ai-team
+/src/main/api/ @api-team
+
+# Database
+/src/main/database/ @database-team
+
+# Documentation
+/docs/ @docs-team
+
+# Build configuration
+*.json @devops-team
+*.js @devops-team
+/scripts/ @devops-team
+
+# Note: Replace the team names with actual GitHub usernames or teams
+# when you set up your repository
