@@ -4,8 +4,8 @@ import { initializeDatabase } from './database/sqlite';
 import { setupApiHandlers } from './api/api-handlers';
 import { setupGeminiService } from './api/gemini';
 import { setupOpenRouterService } from './api/openrouter';
+import { setupAiGenerationService } from './api/ai-generation';
 import { setupApiKeyManager } from './services/api-key-manager';
-import { setupAiGenerationService } from './services/ai-generation-service';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {

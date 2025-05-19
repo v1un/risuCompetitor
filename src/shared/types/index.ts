@@ -727,100 +727,87 @@ export interface OpenRouterConfig {
 }
 
 // Window API Types
-declare global {
-  interface Window {
-    api: {
-      getPath: (name: string) => Promise<string>;
-      
-      apiKey: {
-        save: (service: string, apiKey: string) => Promise<{ success: boolean; error?: string }>;
-        exists: (service: string) => Promise<{ success: boolean; exists: boolean; error?: string }>;
-        delete: (service: string) => Promise<{ success: boolean; error?: string }>;
-      };
-      
-      gemini: {
-        generate: (prompt: string, context: string, config: GeminiConfig) => 
-          Promise<{ success: boolean; response: string; error?: string }>;
-        generateWithHistory: (history: any[], newPrompt: string, config: GeminiConfig) => 
-          Promise<{ success: boolean; response: string; error?: string }>;
-      };
-      
-      openRouter: {
-        getModels: () => Promise<{ success: boolean; models: any[]; error?: string }>;
-        generate: (prompt: string, context: string, config: OpenRouterConfig) => 
-          Promise<{ success: boolean; response: string; error?: string }>;
-        generateWithHistory: (history: any[], newPrompt: string, config: OpenRouterConfig) => 
-          Promise<{ success: boolean; content: string; updatedHistory: any[]; error?: string }>;
-      };
-      
-      character: {
-        get: (id: string) => Promise<{ success: boolean; character: any; error?: string }>;
-        getBySeries: (series: string) => Promise<{ success: boolean; characters: any[]; error?: string }>;
-        create: (character: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, character: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-        search: (query: string) => Promise<{ success: boolean; characters: any[]; error?: string }>;
-      };
-      
-      lorebook: {
-        get: (id: string) => Promise<{ success: boolean; lorebook: any; error?: string }>;
-        getBySeries: (series: string) => Promise<{ success: boolean; lorebooks: any[]; error?: string }>;
-        create: (lorebook: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, lorebook: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-        search: (query: string) => Promise<{ success: boolean; lorebooks: any[]; error?: string }>;
-      };
-      
-      supportTool: {
-        get: (id: string) => Promise<{ success: boolean; tool: any; error?: string }>;
-        getBySeries: (series: string) => Promise<{ success: boolean; tools: any[]; error?: string }>;
-        create: (tool: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, tool: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-      };
-      
-      chatSession: {
-        get: (id: string) => Promise<{ success: boolean; session: any; error?: string }>;
-        getWithMessages: (id: string) => Promise<{ success: boolean; session: any; error?: string }>;
-        create: (session: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, session: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-      };
-      
-      chatMessage: {
-        add: (message: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, message: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-      };
-      
-      toolState: {
-        add: (toolState: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        getLatest: (sessionId: string, toolId: string) => 
-          Promise<{ success: boolean; toolState: any; error?: string }>;
-      };
-      
-      theme: {
-        get: (id: string) => Promise<{ success: boolean; theme: any; error?: string }>;
-        getAll: () => Promise<{ success: boolean; themes: any[]; error?: string }>;
-        create: (theme: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, theme: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-      };
-      
-      settings: {
-        get: (key: string) => Promise<{ success: boolean; setting: any; error?: string }>;
-        getByCategory: (category: string) => Promise<{ success: boolean; settings: any[]; error?: string }>;
-        set: (key: string, value: string, category: string) => 
-          Promise<{ success: boolean; error?: string }>;
-      };
-      
-      series: {
-        get: (id: string) => Promise<{ success: boolean; series: any; error?: string }>;
-        getAll: () => Promise<{ success: boolean; series: any[]; error?: string }>;
-        create: (series: any) => Promise<{ success: boolean; id: string; error?: string }>;
-        update: (id: string, series: any) => Promise<{ success: boolean; error?: string }>;
-        delete: (id: string) => Promise<{ success: boolean; error?: string }>;
-      };
+// Export type aliases for use in other files
+export type Character = CharacterCard;
+
+// API Interface for Window
+export interface WindowAPI {
+  api: {
+    openRouter: {
+      getModels: () => Promise<{ success: boolean; models: any[]; error?: string }>;
+      generate: (prompt: string, context: string, config: OpenRouterConfig) => 
+        Promise<{ success: boolean; response: string; error?: string }>;
+      generateWithHistory: (history: any[], newPrompt: string, config: OpenRouterConfig) => 
+        Promise<{ success: boolean; content: string; updatedHistory: any[]; error?: string }>;
     };
-  }
+    
+    character: {
+      get: (id: string) => Promise<{ success: boolean; character: any; error?: string }>;
+      getBySeries: (series: string) => Promise<{ success: boolean; characters: any[]; error?: string }>;
+      create: (character: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, character: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+      search: (query: string) => Promise<{ success: boolean; characters: any[]; error?: string }>;
+    };
+    
+    lorebook: {
+      get: (id: string) => Promise<{ success: boolean; lorebook: any; error?: string }>;
+      getBySeries: (series: string) => Promise<{ success: boolean; lorebooks: any[]; error?: string }>;
+      create: (lorebook: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, lorebook: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+      search: (query: string) => Promise<{ success: boolean; lorebooks: any[]; error?: string }>;
+    };
+    
+    supportTool: {
+      get: (id: string) => Promise<{ success: boolean; tool: any; error?: string }>;
+      getBySeries: (series: string) => Promise<{ success: boolean; tools: any[]; error?: string }>;
+      create: (tool: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, tool: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+    };
+    
+    chatSession: {
+      get: (id: string) => Promise<{ success: boolean; session: any; error?: string }>;
+      getWithMessages: (id: string) => Promise<{ success: boolean; session: any; error?: string }>;
+      create: (session: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, session: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+    };
+    
+    chatMessage: {
+      add: (message: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, message: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+    };
+    
+    toolState: {
+      add: (toolState: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      getLatest: (sessionId: string, toolId: string) => 
+        Promise<{ success: boolean; toolState: any; error?: string }>;
+    };
+    
+    theme: {
+      get: (id: string) => Promise<{ success: boolean; theme: any; error?: string }>;
+      getAll: () => Promise<{ success: boolean; themes: any[]; error?: string }>;
+      create: (theme: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, theme: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+    };
+    
+    settings: {
+      get: (key: string) => Promise<{ success: boolean; setting: any; error?: string }>;
+      getByCategory: (category: string) => Promise<{ success: boolean; settings: any[]; error?: string }>;
+      set: (key: string, value: string, category: string) => 
+        Promise<{ success: boolean; error?: string }>;
+    };
+    
+    series: {
+      get: (id: string) => Promise<{ success: boolean; series: any; error?: string }>;
+      getAll: () => Promise<{ success: boolean; series: any[]; error?: string }>;
+      create: (series: any) => Promise<{ success: boolean; id: string; error?: string }>;
+      update: (id: string, series: any) => Promise<{ success: boolean; error?: string }>;
+      delete: (id: string) => Promise<{ success: boolean; error?: string }>;
+    };
+  };
 }
