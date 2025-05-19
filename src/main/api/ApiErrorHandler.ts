@@ -300,7 +300,22 @@ export class ApiErrorHandler {
    * Check if the application is offline
    */
   public async isOffline(): Promise<boolean> {
-    return !navigator.onLine;
+    try {
+      // Use DNS lookup to check internet connectivity
+      const dns = require('dns');
+      return new Promise<boolean>((resolve) => {
+        dns.lookup('google.com', (err: Error) => {
+          if (err) {
+            resolve(true); // Offline
+          } else {
+            resolve(false); // Online
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error checking network status:', error);
+      return false; // Assume online if check fails
+    }
   }
 
   /**

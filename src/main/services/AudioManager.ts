@@ -347,6 +347,9 @@ export class AudioManager {
 
   /**
    * Generate speech from text
+   * 
+   * NOTE: This is a placeholder implementation. In a production environment,
+   * this would connect to a TTS service API.
    */
   public async generateSpeech(params: TTSParams): Promise<AudioMetadata> {
     const voice = this.availableVoices.find(v => v.id === params.voice);
@@ -361,15 +364,16 @@ export class AudioManager {
     }
     
     try {
-      // In a real implementation, this would call the appropriate TTS API
-      // For now, we'll simulate a successful response
+      // FEATURE NOT YET IMPLEMENTED
+      // Display a user-friendly message
+      console.warn('TTS functionality is not yet fully implemented');
       
       const id = uuidv4();
       const fileName = `${id}.mp3`;
       const filePath = path.join(this.audioPath, fileName);
       
-      // Create a placeholder file
-      fs.writeFileSync(filePath, 'Placeholder for generated speech');
+      // Create a placeholder file with a note about the feature being in development
+      fs.writeFileSync(filePath, 'This is a placeholder file. Text-to-speech functionality is currently in development.');
       
       // Estimate duration based on text length (very rough estimate)
       const wordCount = params.text.split(/\s+/).length;
@@ -377,17 +381,23 @@ export class AudioManager {
       
       const metadata: AudioMetadata = {
         id,
-        name: `Generated Speech (${voice.name})`,
+        name: `Generated Speech (${voice.name}) [PLACEHOLDER]`,
         category: AudioCategory.VOICE,
         duration,
         path: filePath,
         isBuiltIn: false,
-        tags: ['generated', 'speech', voice.gender, voice.language],
+        tags: ['generated', 'speech', voice.gender, voice.language, 'placeholder'],
         createdAt: new Date()
       };
       
       this.audioCache.set(id, metadata);
-      return metadata;
+      
+      // Return the metadata but also inform the caller about the placeholder status
+      return {
+        ...metadata,
+        // @ts-ignore - Adding a non-standard property to indicate placeholder status
+        isPlaceholder: true
+      } as AudioMetadata;
     } catch (error) {
       console.error('Failed to generate speech:', error);
       throw new Error(`Speech generation failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -452,6 +462,9 @@ export class AudioManager {
 
   /**
    * Download an audio file from a URL
+   * 
+   * NOTE: This is a partially implemented feature. In a production environment,
+   * this would include proper audio file validation and metadata extraction.
    */
   public async downloadAudio(
     url: string,
@@ -461,6 +474,10 @@ export class AudioManager {
     loop: boolean = false
   ): Promise<AudioMetadata> {
     try {
+      // FEATURE PARTIALLY IMPLEMENTED
+      console.warn('Audio download functionality is partially implemented');
+      
+      // Attempt to download the file
       const response = await axios.get(url, { responseType: 'arraybuffer' });
       const buffer = Buffer.from(response.data, 'binary');
       
@@ -471,24 +488,30 @@ export class AudioManager {
       
       fs.writeFileSync(filePath, buffer);
       
-      // In a real implementation, we would determine the duration from the audio file
-      // For now, we'll use a placeholder value
-      const duration = 60; // 1 minute
+      // TODO: Implement proper audio duration detection
+      // For now, we'll use a placeholder value and mark it as such
+      const duration = 60; // 1 minute placeholder
       
       const metadata: AudioMetadata = {
         id,
-        name,
+        name: `${name} [Duration Estimate]`,
         category,
         duration,
         path: filePath,
         isBuiltIn: false,
-        tags,
+        tags: [...tags, 'duration-estimate'],
         loop,
         createdAt: new Date()
       };
       
       this.audioCache.set(id, metadata);
-      return metadata;
+      
+      // Return the metadata with a note about the duration being estimated
+      return {
+        ...metadata,
+        // @ts-ignore - Adding a non-standard property to indicate duration is estimated
+        durationEstimated: true
+      } as AudioMetadata;
     } catch (error) {
       console.error('Failed to download audio:', error);
       throw new Error(`Failed to download audio: ${error instanceof Error ? error.message : String(error)}`);

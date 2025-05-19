@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import axios from 'axios';
 import { getApiKey } from '../services/api-key-manager';
+import { apiErrorHandler } from './ApiErrorHandler';
 
 // Types
 export interface OpenRouterConfig {
@@ -22,13 +23,17 @@ export function setupOpenRouterService(): void {
   // Get available models
   ipcMain.handle('openrouter:get-models', async () => {
     try {
-      const models = await getAvailableModels();
+      const models = await apiErrorHandler.handleWithRetry(() => 
+        getAvailableModels()
+      );
       return { success: true, models };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching OpenRouter models:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: errorMessage,
+        details: error
       };
     }
   });
@@ -36,13 +41,17 @@ export function setupOpenRouterService(): void {
   // Generate text
   ipcMain.handle('openrouter:generate', async (_, prompt: string, context: string, config: OpenRouterConfig) => {
     try {
-      const response = await generateWithOpenRouter(prompt, context, config);
+      const response = await apiErrorHandler.handleWithRetry(() => 
+        generateWithOpenRouter(prompt, context, config)
+      );
       return { success: true, response };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating content with OpenRouter:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: errorMessage,
+        details: error
       };
     }
   });
@@ -50,13 +59,17 @@ export function setupOpenRouterService(): void {
   // Generate with history
   ipcMain.handle('openrouter:generate-with-history', async (_, history: OpenRouterMessage[], newPrompt: string, config: OpenRouterConfig) => {
     try {
-      const result = await generateWithHistoryOpenRouter(history, newPrompt, config);
+      const result = await apiErrorHandler.handleWithRetry(() => 
+        generateWithHistoryOpenRouter(history, newPrompt, config)
+      );
       return { success: true, ...result };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating content with history:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: errorMessage,
+        details: error
       };
     }
   });

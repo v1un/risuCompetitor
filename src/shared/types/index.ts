@@ -1,3 +1,9 @@
+// Export keyboard shortcut types
+export * from './keyboard';
+
+// Export combat system types
+export * from './combat';
+
 // Character Types
 export interface CharacterCard {
   version: string;

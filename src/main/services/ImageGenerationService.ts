@@ -240,6 +240,9 @@ export class ImageGenerationService {
 
   /**
    * Generate image with Stable Diffusion
+   * 
+   * NOTE: This is a placeholder implementation. In a production environment,
+   * this would connect to the Stable Diffusion API.
    */
   private async generateWithStableDiffusion(
     params: ImageGenerationParams,
@@ -256,45 +259,28 @@ export class ImageGenerationService {
     const apiUrl = 'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image';
     
     try {
-      // In a real implementation, this would be an actual API call
-      // For now, we'll simulate a successful response
-      /*
-      const response = await axios.post(
-        apiUrl,
-        {
-          text_prompts: [
-            {
-              text: params.prompt,
-              weight: 1.0
-            },
-            ...(params.negativePrompt ? [{ text: params.negativePrompt, weight: -1.0 }] : [])
-          ],
-          cfg_scale: guidanceScale,
-          height,
-          width,
-          samples: params.numImages || 1,
-          steps,
-          seed
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          }
-        }
-      );
-      */
+      // FEATURE NOT YET IMPLEMENTED
+      console.warn('Image generation with Stable Diffusion is not yet implemented');
       
-      // Simulate API response
+      // Create a placeholder image with text indicating this is a placeholder
       const imageId = uuidv4();
       const fileName = `${imageId}.png`;
       const localPath = path.join(this.imageSavePath, fileName);
       
-      // In a real implementation, we would save the image from the API response
-      // For now, we'll just create a placeholder file
-      fs.writeFileSync(localPath, 'Placeholder for generated image');
+      // Create a text file explaining that this is a placeholder
+      fs.writeFileSync(
+        localPath, 
+        `This is a placeholder for an image that would be generated with the following parameters:
+        - Prompt: ${params.prompt}
+        - Negative Prompt: ${params.negativePrompt || 'None'}
+        - Model: ${model.id}
+        - Size: ${width}x${height}
+        - Seed: ${seed}
+        
+        Image generation is currently under development.`
+      );
       
+      // Return a result object with a clear indication this is a placeholder
       return {
         id: imageId,
         url: `file://${localPath}`,
@@ -310,7 +296,9 @@ export class ImageGenerationService {
         metadata: {
           steps,
           guidanceScale,
-          style: params.style
+          style: params.style,
+          isPlaceholder: true,
+          placeholderReason: 'Image generation not yet implemented'
         }
       };
     } catch (error) {
@@ -320,6 +308,9 @@ export class ImageGenerationService {
 
   /**
    * Generate image with DALL-E
+   * 
+   * NOTE: This is a placeholder implementation. In a production environment,
+   * this would connect to the OpenAI DALL-E API.
    */
   private async generateWithDallE(
     params: ImageGenerationParams,
@@ -333,35 +324,26 @@ export class ImageGenerationService {
     const apiUrl = 'https://api.openai.com/v1/images/generations';
     
     try {
-      // In a real implementation, this would be an actual API call
-      // For now, we'll simulate a successful response
-      /*
-      const response = await axios.post(
-        apiUrl,
-        {
-          prompt: params.prompt,
-          n: params.numImages || 1,
-          size: `${width}x${height}`,
-          model: model.id
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          }
-        }
-      );
-      */
+      // FEATURE NOT YET IMPLEMENTED
+      console.warn('Image generation with DALL-E is not yet implemented');
       
-      // Simulate API response
+      // Create a placeholder image with text indicating this is a placeholder
       const imageId = uuidv4();
       const fileName = `${imageId}.png`;
       const localPath = path.join(this.imageSavePath, fileName);
       
-      // In a real implementation, we would save the image from the API response
-      // For now, we'll just create a placeholder file
-      fs.writeFileSync(localPath, 'Placeholder for generated image');
+      // Create a text file explaining that this is a placeholder
+      fs.writeFileSync(
+        localPath, 
+        `This is a placeholder for an image that would be generated with the following parameters:
+        - Prompt: ${params.prompt}
+        - Model: ${model.id}
+        - Size: ${width}x${height}
+        
+        DALL-E image generation is currently under development.`
+      );
       
+      // Return a result object with a clear indication this is a placeholder
       return {
         id: imageId,
         url: `file://${localPath}`,
@@ -374,7 +356,9 @@ export class ImageGenerationService {
         createdAt: new Date(),
         metadata: {
           quality: 'standard',
-          style: params.style
+          style: params.style,
+          isPlaceholder: true,
+          placeholderReason: 'DALL-E image generation not yet implemented'
         }
       };
     } catch (error) {
