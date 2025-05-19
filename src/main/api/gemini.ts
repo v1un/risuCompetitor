@@ -1,6 +1,8 @@
 import { ipcMain } from 'electron';
-import { GoogleGenerativeAI, GenerativeModel, GenerationConfig, SafetySetting } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import type { GenerationConfig, SafetySetting } from '@google/generative-ai';
 import { getApiKey } from '../services/api-key-manager';
+import { apiErrorHandler } from './ApiErrorHandler';
 
 // Types
 export interface GeminiConfig {
@@ -23,13 +25,17 @@ export function setupGeminiService(): void {
   // Generate text
   ipcMain.handle('gemini:generate', async (_, prompt: string, context: string, config: GeminiConfig) => {
     try {
-      const response = await generateNarratorResponse(prompt, context, config);
+      const response = await apiErrorHandler.handleWithRetry(() => 
+        generateNarratorResponse(prompt, context, config)
+      );
       return { success: true, response };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating content with Gemini:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: errorMessage,
+        details: error
       };
     }
   });
@@ -37,13 +43,17 @@ export function setupGeminiService(): void {
   // Generate with history
   ipcMain.handle('gemini:generate-with-history', async (_, history: ChatMessage[], newPrompt: string, config: GeminiConfig) => {
     try {
-      const response = await generateWithHistory(history, newPrompt, config);
+      const response = await apiErrorHandler.handleWithRetry(() => 
+        generateWithHistory(history, newPrompt, config)
+      );
       return { success: true, response };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating content with history:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : String(error) 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: errorMessage,
+        details: error
       };
     }
   });
