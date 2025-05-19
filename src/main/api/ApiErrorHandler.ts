@@ -323,21 +323,47 @@ export class ApiErrorHandler {
    */
   public async getErrorAnalytics(days = 7): Promise<any> {
     try {
-      const logContent = fs.readFileSync(this.logPath, 'utf8');
-      const lines = logContent.split('\n').filter(line => line.trim());
+      // Check if file exists first
+      if (!fs.existsSync(this.logPath)) {
+        return {
+          totalErrors: 0,
+          categoryCounts: {},
+          severityCounts: {},
+          hourlyDistribution: {},
+          timeRange: {
+            start: new Date(Date.now() - (days * 24 * 60 * 60 * 1000)).toISOString(),
+            end: new Date().toISOString()
+          }
+        };
+      }
       
       const now = Date.now();
       const cutoff = now - (days * 24 * 60 * 60 * 1000);
       
-      const recentErrors = lines
-        .map(line => {
+      // Use readline interface for streaming the file instead of loading it all at once
+      const readline = require('readline');
+      const fileStream = fs.createReadStream(this.logPath);
+      const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+      });
+      
+      const recentErrors = [];
+      
+      // Process the file line by line
+      for await (const line of rl) {
+        if (line.trim()) {
           try {
-            return JSON.parse(line);
+            const entry = JSON.parse(line);
+            if (entry && new Date(entry.timestamp).getTime() > cutoff) {
+              recentErrors.push(entry);
+            }
           } catch {
-            return null;
+            // Skip invalid JSON lines
+            continue;
           }
-        })
-        .filter(entry => entry && new Date(entry.timestamp).getTime() > cutoff);
+        }
+      }
       
       // Aggregate error data
       const categoryCounts: Record<string, number> = {};

@@ -31,11 +31,13 @@ export function setupGeminiService(): void {
       return { success: true, response };
     } catch (error: unknown) {
       console.error('Error generating content with Gemini:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
+      // Use the centralized error handler to create a standardized error response
+      const errorResponse = apiErrorHandler.classifyError(error);
+      apiErrorHandler.logError(errorResponse);
+      return { 
+        success: false, 
+        error: errorResponse,
+        context: { endpoint: 'gemini:generate', prompt, context }
       };
     }
   });
@@ -49,11 +51,13 @@ export function setupGeminiService(): void {
       return { success: true, response };
     } catch (error: unknown) {
       console.error('Error generating content with history:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
+      // Use the centralized error handler to create a standardized error response
+      const errorResponse = apiErrorHandler.classifyError(error);
+      apiErrorHandler.logError(errorResponse);
+      return { 
+        success: false, 
+        error: errorResponse,
+        context: { endpoint: 'gemini:generate-with-history', history, newPrompt }
       };
     }
   });
@@ -85,7 +89,13 @@ export async function generateNarratorResponse(prompt: string, context: string, 
   };
   
   const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: context + prompt }] }],
+    contents: [{ 
+      role: 'user', 
+      parts: [
+        { text: context },
+        { text: prompt }
+      ] 
+    }],
     generationConfig,
     safetySettings: config.safetySettings,
   });

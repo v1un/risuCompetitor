@@ -52,10 +52,19 @@ export function setupApiKeyManager(): void {
 
 // Save API key to the database
 export async function saveApiKey(service: ApiService, apiKey: string): Promise<void> {
+  // Validate inputs
+  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim() === '') {
+    throw new Error('API key cannot be empty');
+  }
+  
+  if (!['gemini', 'openrouter'].includes(service)) {
+    throw new Error('Invalid service type');
+  }
+  
   const db = getDatabase();
   
   // Encrypt the API key
-  const encryptedKey = safeStorage.encryptString(apiKey);
+  const encryptedKey = safeStorage.encryptString(apiKey.trim());
   
   // Convert the encrypted Buffer to a hex string for storage
   const encryptedKeyHex = encryptedKey.toString('hex');

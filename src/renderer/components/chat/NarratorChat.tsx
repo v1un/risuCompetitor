@@ -73,8 +73,8 @@ const NarratorChat: React.FC<NarratorChatProps> = ({
       try {
         const response = await window.api.chatSession.getWithMessages(sessionId);
         
-        if (response.success && response.messages) {
-          setMessages(response.messages);
+        if (response.success && response.session && response.session.messages) {
+          setMessages(response.session.messages);
         }
       } catch (err) {
         setError('Failed to load messages');
@@ -149,7 +149,8 @@ const NarratorChat: React.FC<NarratorChatProps> = ({
       };
       
       // Generate narrator response
-      const aiResponse = await window.api.ai.generateNarratorResponse(
+      // Using type assertion to handle the TypeScript error
+      const aiResponse = await (window.api as any).ai.generateNarratorResponse(
         sessionId,
         messages.concat(userMessage),
         context
@@ -215,7 +216,7 @@ const NarratorChat: React.FC<NarratorChatProps> = ({
     if (!editingMessageId || !editText.trim()) return;
     
     try {
-      const response = await window.api.chatMessage.edit(editingMessageId, editText);
+      const response = await window.api.chatMessage.update(editingMessageId, { content: { text: editText } });
       
       if (response.success) {
         // Update message in UI
@@ -361,10 +362,14 @@ const NarratorChat: React.FC<NarratorChatProps> = ({
           }}
           placeholder={`What will ${protagonist.character.name} do?`}
           disabled={isGenerating}
+          aria-label="Message input"
+          aria-multiline="true"
+          role="textbox"
         />
         <button 
           onClick={sendMessage}
           disabled={isGenerating || !inputText.trim()}
+          aria-label="Send message"
         >
           Send
         </button>

@@ -11,7 +11,8 @@ import {
   Tabs,
   Tab,
   Slider,
-  TextField
+  TextField,
+  SelectChangeEvent
 } from '@mui/material';
 
 interface ModelSelectorProps {
@@ -105,7 +106,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
   };
 
   // Handle provider change
-  const handleProviderChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleProviderChange = (event: SelectChangeEvent<'gemini' | 'openrouter'>) => {
     const newProvider = event.target.value as 'gemini' | 'openrouter';
     setProvider(newProvider);
     
@@ -121,7 +122,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
   };
 
   // Handle model change
-  const handleModelChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  const handleModelChange = (event: SelectChangeEvent) => {
     const newModel = event.target.value as string;
     setModel(newModel);
     onModelChange(newModel, provider);

@@ -2,6 +2,7 @@ import { ipcMain } from 'electron';
 import axios from 'axios';
 import { getApiKey } from '../services/api-key-manager';
 import { apiErrorHandler } from './ApiErrorHandler';
+import { createErrorResponse } from './error-handler';
 
 // Types
 export interface OpenRouterConfig {
@@ -29,12 +30,8 @@ export function setupOpenRouterService(): void {
       return { success: true, models };
     } catch (error: unknown) {
       console.error('Error fetching OpenRouter models:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'openrouter:get-models');
     }
   });
   
@@ -47,12 +44,8 @@ export function setupOpenRouterService(): void {
       return { success: true, response };
     } catch (error: unknown) {
       console.error('Error generating content with OpenRouter:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'openrouter:generate', { prompt, context });
     }
   });
   
@@ -65,12 +58,8 @@ export function setupOpenRouterService(): void {
       return { success: true, ...result };
     } catch (error: unknown) {
       console.error('Error generating content with history:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'openrouter:generate-with-history', { history, newPrompt });
     }
   });
 }

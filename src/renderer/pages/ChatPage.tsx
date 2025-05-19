@@ -364,13 +364,29 @@ const ChatPage: React.FC = () => {
                   
                   <Typography variant="h6">Attributes</Typography>
                   <Grid container spacing={2} sx={{ mt: 1 }}>
-                    {Object.entries(protagonist.rpg_attributes.stats).map(([key, value]) => (
+                    {/* Core attributes */}
+                    {['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'].map((key) => (
                       <Grid item xs={4} sm={2} key={key}>
                         <Paper sx={{ p: 1, textAlign: 'center' }}>
                           <Typography variant="body2" color="text.secondary">
                             {key.toUpperCase()}
                           </Typography>
-                          <Typography variant="h6">{value}</Typography>
+                          <Typography variant="h6">{protagonist.rpg_attributes.stats[key]}</Typography>
+                        </Paper>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  
+                  {/* Combat Stats */}
+                  <Typography variant="h6" sx={{ mt: 3 }}>Combat Stats</Typography>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    {['hp', 'max_hp', 'ac'].map((key) => (
+                      <Grid item xs={4} sm={2} key={key}>
+                        <Paper sx={{ p: 1, textAlign: 'center' }}>
+                          <Typography variant="body2" color="text.secondary">
+                            {key === 'hp' ? 'HP' : key === 'max_hp' ? 'MAX HP' : 'AC'}
+                          </Typography>
+                          <Typography variant="h6">{protagonist.rpg_attributes.stats[key]}</Typography>
                         </Paper>
                       </Grid>
                     ))}

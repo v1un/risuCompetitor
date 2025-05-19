@@ -27,7 +27,25 @@ export async function initializeDatabase(): Promise<void> {
   // Create tables
   await createTables();
   
+  // Register close handler when app is quitting
+  app.on('before-quit', async () => {
+    await closeDatabase();
+  });
+  
   console.log('Database initialized successfully');
+}
+
+export async function closeDatabase(): Promise<void> {
+  if (db) {
+    try {
+      await db.close();
+      console.log('Database connection closed successfully');
+    } catch (error) {
+      console.error('Error closing database connection:', error);
+    } finally {
+      db = null;
+    }
+  }
 }
 
 export function getDatabase(): Database {
