@@ -411,3 +411,21 @@ export class ApiErrorHandler {
 
 // Export singleton instance
 export const apiErrorHandler = ApiErrorHandler.getInstance();
+
+/**
+ * Helper function to create a standardized error response
+ * @param error The error object
+ * @param source The source of the error (e.g., function or endpoint name)
+ * @param requestInfo Additional information about the request
+ * @returns A standardized error response object
+ */
+export function createErrorResponse(error: any, source: string, requestInfo?: any): { success: false, error: string, details: ErrorResponse } {
+  const errorResponse = apiErrorHandler.classifyError(error);
+  apiErrorHandler.logError(errorResponse);
+  
+  return {
+    success: false,
+    error: errorResponse.userMessage,
+    details: errorResponse
+  };
+}

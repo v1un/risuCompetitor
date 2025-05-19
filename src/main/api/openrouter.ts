@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
 import axios from 'axios';
 import { getApiKey } from '../services/api-key-manager';
-import { apiErrorHandler } from './ApiErrorHandler';
-import { createErrorResponse } from './error-handler';
+import { apiErrorHandler, createErrorResponse } from './ApiErrorHandler';
+import { API_ENDPOINTS } from '../../shared/config';
 
 // Types
 export interface OpenRouterConfig {
@@ -73,7 +73,7 @@ async function initializeOpenRouterClient() {
   }
   
   return axios.create({
-    baseURL: 'https://openrouter.ai/api/v1',
+    baseURL: API_ENDPOINTS.OPENROUTER.BASE_URL,
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'HTTP-Referer': 'http://localhost:3000', // Replace with your app's URL in production
@@ -85,7 +85,7 @@ async function initializeOpenRouterClient() {
 // Get available models
 export async function getAvailableModels() {
   const client = await initializeOpenRouterClient();
-  const response = await client.get('/models');
+  const response = await client.get(API_ENDPOINTS.OPENROUTER.MODELS);
   return response.data.data;
 }
 
@@ -93,7 +93,7 @@ export async function getAvailableModels() {
 export async function generateWithOpenRouter(prompt: string, context: string, config: OpenRouterConfig): Promise<string> {
   const client = await initializeOpenRouterClient();
   
-  const response = await client.post('/chat/completions', {
+  const response = await client.post(API_ENDPOINTS.OPENROUTER.CHAT_COMPLETIONS, {
     model: config.model,
     messages: [
       { role: 'system', content: context },
@@ -119,7 +119,7 @@ export async function generateWithHistoryOpenRouter(history: OpenRouterMessage[]
     { role: 'user', content: newPrompt }
   ];
   
-  const response = await client.post('/chat/completions', {
+  const response = await client.post(API_ENDPOINTS.OPENROUTER.CHAT_COMPLETIONS, {
     model: config.model,
     messages: updatedHistory,
     temperature: config.temperature,

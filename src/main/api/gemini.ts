@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { GenerationConfig, SafetySetting } from '@google/generative-ai';
 import { getApiKey } from '../services/api-key-manager';
-import { apiErrorHandler } from './ApiErrorHandler';
+import { apiErrorHandler, createErrorResponse } from './ApiErrorHandler';
 
 // Types
 export interface GeminiConfig {
@@ -32,13 +32,7 @@ export function setupGeminiService(): void {
     } catch (error: unknown) {
       console.error('Error generating content with Gemini:', error);
       // Use the centralized error handler to create a standardized error response
-      const errorResponse = apiErrorHandler.classifyError(error);
-      apiErrorHandler.logError(errorResponse);
-      return { 
-        success: false, 
-        error: errorResponse,
-        context: { endpoint: 'gemini:generate', prompt, context }
-      };
+      return createErrorResponse(error, 'gemini:generate', { prompt, context });
     }
   });
   
@@ -52,13 +46,7 @@ export function setupGeminiService(): void {
     } catch (error: unknown) {
       console.error('Error generating content with history:', error);
       // Use the centralized error handler to create a standardized error response
-      const errorResponse = apiErrorHandler.classifyError(error);
-      apiErrorHandler.logError(errorResponse);
-      return { 
-        success: false, 
-        error: errorResponse,
-        context: { endpoint: 'gemini:generate-with-history', history, newPrompt }
-      };
+      return createErrorResponse(error, 'gemini:generate-with-history', { history, newPrompt });
     }
   });
 }
