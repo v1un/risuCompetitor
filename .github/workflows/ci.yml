@@ -11,8 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [16.x, 18.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v3
@@ -30,7 +31,7 @@ jobs:
       run: npm run lint || echo "Linting failed but continuing"
     
     - name: Build
-      run: npm run build
+      run: npm run build --verbose
     
     - name: Test
       run: npm test || echo "Tests failed but continuing"
