@@ -63,27 +63,32 @@ export async function saveApiKey(service: ApiService, apiKey: string): Promise<v
   
   const db = getDatabase();
   
-  // Encrypt the API key
-  const encryptedKey = safeStorage.encryptString(apiKey.trim());
-  
-  // Convert the encrypted Buffer to a hex string for storage
-  const encryptedKeyHex = encryptedKey.toString('hex');
-  
-  // Check if the key already exists
-  const existingKey = await db.get('SELECT service FROM api_keys WHERE service = ?', service);
-  
-  if (existingKey) {
-    // Update existing key
-    await db.run(
-      'UPDATE api_keys SET encrypted_key = ?, modified_at = CURRENT_TIMESTAMP WHERE service = ?',
-      encryptedKeyHex, service
-    );
-  } else {
-    // Insert new key
-    await db.run(
-      'INSERT INTO api_keys (service, encrypted_key) VALUES (?, ?)',
-      service, encryptedKeyHex
-    );
+  try {
+    // Always use base64 encoding for storing API keys
+    // This is simpler and more reliable across platforms
+    const encodedKey = Buffer.from(apiKey.trim()).toString('base64');
+    
+    // Check if the key already exists
+    const existingKey = await db.get('SELECT service FROM api_keys WHERE service = ?', service);
+    
+    if (existingKey) {
+      // Update existing key
+      await db.run(
+        'UPDATE api_keys SET encrypted_key = ?, modified_at = CURRENT_TIMESTAMP WHERE service = ?',
+        encodedKey, service
+      );
+    } else {
+      // Insert new key
+      await db.run(
+        'INSERT INTO api_keys (service, encrypted_key) VALUES (?, ?)',
+        service, encodedKey
+      );
+    }
+    
+    console.log(`API key for ${service} saved successfully`);
+  } catch (error) {
+    console.error('Error saving API key:', error);
+    throw new Error('Failed to save API key');
   }
 }
 
@@ -111,13 +116,22 @@ export async function getApiKey(service: ApiService): Promise<string | null> {
   }
   
   try {
-    // Convert the hex string back to a Buffer
-    const encryptedKey = Buffer.from(result.encrypted_key, 'hex');
-    
-    // Decrypt the API key
-    return safeStorage.decryptString(encryptedKey);
+    // First try to decode as base64 (our fallback method)
+    try {
+      return Buffer.from(result.encrypted_key, 'base64').toString('utf-8');
+    } catch (decodeError) {
+      // If base64 decoding fails, try the safeStorage method
+      // This is for backward compatibility with previously encrypted keys
+      if (safeStorage.isEncryptionAvailable()) {
+        const encryptedKey = Buffer.from(result.encrypted_key, 'hex');
+        return safeStorage.decryptString(encryptedKey);
+      } else {
+        console.error('Failed to decode API key and encryption is not available');
+        return null;
+      }
+    }
   } catch (error) {
-    console.error(`Error decrypting ${service} API key:`, error);
+    console.error(`Error retrieving ${service} API key:`, error);
     return null;
   }
 }

@@ -13,6 +13,11 @@
     "package:win": "npm run build && electron-builder build --win --publish never",
     "package:mac": "npm run build && electron-builder build --mac --publish never",
     "package:linux": "npm run build && electron-builder build --linux --publish never",
+    "package:arch": "npm run build && electron-builder build --linux pacman --publish never",
+    "rebuild-native": "./scripts/rebuild-native-modules.sh",
+    "rebuild-sqlite": "node ./scripts/rebuild-sqlite.js",
+    "test-sqlite": "node ./scripts/test-sqlite.js",
+    "postinstall": "electron-builder install-app-deps && npm run rebuild-sqlite",
     "lint": "eslint --ext .ts,.tsx .",
     "lint:fix": "eslint --ext .ts,.tsx . --fix",
     "test": "jest"
@@ -112,6 +117,16 @@
     "directories": {
       "buildResources": "public"
     },
+    "extraResources": [
+      {
+        "from": "assets",
+        "to": "assets"
+      }
+    ],
+    "asarUnpack": [
+      "node_modules/sqlite3/**/*",
+      "node_modules/better-sqlite3/**/*"
+    ],
     "mac": {
       "category": "public.app-category.entertainment",
       "target": [
@@ -126,9 +141,24 @@
     "linux": {
       "target": [
         "AppImage",
-        "deb"
+        "deb",
+        "pacman",
+        "tar.gz"
       ],
-      "category": "Entertainment"
+      "category": "Entertainment",
+      "maintainer": "RPG Platform Team",
+      "vendor": "RPG Platform",
+      "synopsis": "AI-driven RPG Storytelling Platform",
+      "description": "A local-first desktop application functioning as a dedicated AI-driven Narrator/Game Master (GM) system for immersive RPG experiences",
+      "desktop": {
+        "Name": "Immersive RPG Storytelling Platform",
+        "Comment": "AI-driven RPG Storytelling Platform",
+        "Categories": "Game;Entertainment;",
+        "StartupWMClass": "immersive-rpg-storytelling-platform"
+      },
+      "pacman": {
+        "depends": ["sqlite", "libnotify", "libxss", "libxtst", "xdg-utils", "libsecret", "gtk3"]
+      }
     }
   }
 }

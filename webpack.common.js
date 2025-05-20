@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   resolve: {
@@ -26,6 +27,7 @@ module.exports = {
       "https": require.resolve("https-browserify"),
       "constants": require.resolve("constants-browserify"),
       "vm": require.resolve("vm-browserify"),
+      "child_process": false,
     },
   },
   module: {
@@ -73,4 +75,12 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name]/index.js',
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process',
+    }),
+  ],
 };

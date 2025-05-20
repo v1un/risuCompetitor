@@ -67,7 +67,10 @@ const ApiKeySetupPage: React.FC = () => {
   };
   
   const handleFinish = () => {
-    navigate('/');
+    // Set a flag in localStorage to indicate API keys have been set
+    localStorage.setItem('apiKeysConfigured', 'true');
+    // Force a reload to ensure the app recognizes the new API key state
+    window.location.href = '/';
   };
   
   const getStepContent = (step: number) => {

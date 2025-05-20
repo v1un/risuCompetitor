@@ -2,6 +2,82 @@ import { ipcMain } from 'electron';
 import { getDatabase } from '../database/sqlite';
 import { v4 as uuidv4 } from 'uuid';
 
+// Define types for database entities
+interface Character {
+  id: string;
+  name: string;
+  role: string;
+  series: string;
+  data: any;
+  avatar?: Buffer;
+  created_at: string;
+  modified_at: string;
+  is_favorite: number;
+  folder?: string;
+}
+
+interface Lorebook {
+  id: string;
+  title: string;
+  series: string;
+  data: any;
+  created_at: string;
+  modified_at: string;
+  is_favorite: number;
+  folder?: string;
+}
+
+interface SupportTool {
+  id: string;
+  name: string;
+  type: string;
+  series: string;
+  data: any;
+  created_at: string;
+  modified_at: string;
+  is_favorite: number;
+  folder?: string;
+}
+
+interface ChatMessage {
+  id: string;
+  session_id: string;
+  type: string;
+  sender_id?: string;
+  sender_name: string;
+  content: string;
+  formatted_content?: string;
+  timestamp: string;
+  is_edited: number;
+  edit_history?: any;
+  is_regenerated: number;
+  regeneration_history?: any;
+  metadata?: any;
+}
+
+interface Theme {
+  id: string;
+  name: string;
+  type: string;
+  data: any;
+  created_at: string;
+  modified_at: string;
+  is_favorite: number;
+  is_system: number;
+}
+
+interface Series {
+  id: string;
+  name: string;
+  description?: string;
+  genre?: string;
+  tags?: any;
+  created_at: string;
+  modified_at: string;
+  is_favorite: number;
+  is_system: number;
+}
+
 // Setup IPC handlers for database operations
 export function setupApiHandlers(): void {
   // Character handlers

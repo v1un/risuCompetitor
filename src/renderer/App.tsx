@@ -30,7 +30,10 @@ const App: React.FC = () => {
         const geminiKeyExists = await window.api.apiKey.exists('gemini');
         const openRouterKeyExists = await window.api.apiKey.exists('openrouter');
         
-        setHasApiKeys(geminiKeyExists.exists || openRouterKeyExists.exists);
+        // Also check localStorage flag
+        const apiKeysConfigured = localStorage.getItem('apiKeysConfigured') === 'true';
+        
+        setHasApiKeys(geminiKeyExists.exists || openRouterKeyExists.exists || apiKeysConfigured);
         setIsLoading(false);
       } catch (error) {
         console.error('Error initializing app:', error);

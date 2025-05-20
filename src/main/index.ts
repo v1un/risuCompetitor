@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
 import * as path from 'path';
+import * as os from 'os';
 import { initializeDatabase } from './database/sqlite';
 import { setupApiHandlers } from './api/api-handlers';
 import { setupGeminiService } from './api/gemini';
@@ -7,9 +8,28 @@ import { setupOpenRouterService } from './api/openrouter';
 import { setupAiGenerationService } from './api/ai-generation';
 import { setupApiKeyManager } from './services/api-key-manager';
 
+// Set app name for Linux
+if (process.platform === 'linux') {
+  app.setName('immersive-rpg-storytelling-platform');
+  
+  // Fix for Wayland on some Linux distributions
+  app.commandLine.appendSwitch('enable-features', 'WaylandWindowDecorations');
+  app.commandLine.appendSwitch('ozone-platform-hint', 'auto');
+  
+  // Fix for hardware acceleration issues on some Linux systems
+  if (process.env.DISABLE_GPU) {
+    app.disableHardwareAcceleration();
+    app.commandLine.appendSwitch('disable-gpu');
+  }
+}
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  app.quit();
+try {
+  if (process.platform === 'win32' && require('electron-squirrel-startup')) {
+    app.quit();
+  }
+} catch (error) {
+  console.warn('electron-squirrel-startup not available:', error);
 }
 
 let mainWindow: BrowserWindow | null = null;
@@ -25,8 +45,15 @@ const createWindow = (): void => {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      spellcheck: true,
     },
     show: false,
+    // Linux-specific options
+    ...(process.platform === 'linux' ? {
+      icon: path.join(__dirname, '../../assets/icons/png/512x512.png'),
+      // Better integration with desktop environments
+      autoHideMenuBar: false,
+    } : {}),
   });
 
   // and load the index.html of the app.
@@ -40,6 +67,19 @@ const createWindow = (): void => {
   // Open the DevTools in development mode
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
+  }
+  
+  // Handle Linux-specific window behavior
+  if (process.platform === 'linux') {
+    // Fix for some Linux window managers
+    mainWindow.setMenuBarVisibility(true);
+    
+    // Fix for screen tearing on some Linux distributions
+    mainWindow.on('resize', () => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.invalidate();
+      }
+    });
   }
 };
 
