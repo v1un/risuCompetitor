@@ -108,6 +108,14 @@ contextBridge.exposeInMainWorld('api', {
     delete: (id: string) => ipcRenderer.invoke('series:delete', id),
   },
   
+  // Inventory and Items
+  inventory: {
+    getItems: () => ipcRenderer.invoke('inventory:get-items'),
+    getLootTables: () => ipcRenderer.invoke('inventory:get-loot-tables'),
+    getInventory: (characterId: string) => ipcRenderer.invoke('inventory:get', characterId),
+    saveInventory: (inventory: any) => ipcRenderer.invoke('inventory:save', inventory),
+  },
+  
   // AI Generation
   ai: {
     generateCharacter: (series: string, role: string, additionalInfo?: string) => 

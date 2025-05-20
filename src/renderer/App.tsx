@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography, Button } from '@mui/material';
 import Layout from './components/layout/Layout';
 import HomePage from './pages/HomePage';
 import ChatPage from './pages/ChatPage';
@@ -30,7 +30,10 @@ const App: React.FC = () => {
         const geminiKeyExists = await window.api.apiKey.exists('gemini');
         const openRouterKeyExists = await window.api.apiKey.exists('openrouter');
         
-        setHasApiKeys(geminiKeyExists.exists || openRouterKeyExists.exists);
+        // Also check localStorage flag
+        const apiKeysConfigured = localStorage.getItem('apiKeysConfigured') === 'true';
+        
+        setHasApiKeys(geminiKeyExists.exists || openRouterKeyExists.exists || apiKeysConfigured);
         setIsLoading(false);
       } catch (error) {
         console.error('Error initializing app:', error);

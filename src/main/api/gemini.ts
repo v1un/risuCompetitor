@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { GenerationConfig, SafetySetting } from '@google/generative-ai';
 import { getApiKey } from '../services/api-key-manager';
-import { apiErrorHandler } from './ApiErrorHandler';
+import { apiErrorHandler, createErrorResponse } from './ApiErrorHandler';
 
 // Types
 export interface GeminiConfig {
@@ -31,12 +31,8 @@ export function setupGeminiService(): void {
       return { success: true, response };
     } catch (error: unknown) {
       console.error('Error generating content with Gemini:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'gemini:generate', { prompt, context });
     }
   });
   
@@ -49,12 +45,8 @@ export function setupGeminiService(): void {
       return { success: true, response };
     } catch (error: unknown) {
       console.error('Error generating content with history:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'gemini:generate-with-history', { history, newPrompt });
     }
   });
 }
@@ -85,7 +77,13 @@ export async function generateNarratorResponse(prompt: string, context: string, 
   };
   
   const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: context + prompt }] }],
+    contents: [{ 
+      role: 'user', 
+      parts: [
+        { text: context },
+        { text: prompt }
+      ] 
+    }],
     generationConfig,
     safetySettings: config.safetySettings,
   });

@@ -1,0 +1,177 @@
+// Export keyboard shortcut types
+export * from './keyboard';
+
+// Export combat system types
+export * from './combat';
+
+// Character Types
+export interface CharacterCard {
+  version: string;
+  type: 'character';
+  metadata: {
+    id: string;
+    created: string;
+    modified: string;
+    series: string;
+  };
+  character: {
+    name: string;
+    role: 'protagonist' | 'npc' | 'antagonist';
+    avatar: string;
+    description: string;
+    background: string;
+  };
+}
+
+// Lorebook Types
+export interface Lorebook {
+  version: string;
+  type: 'lorebook';
+  metadata: {
+    id: string;
+    created: string;
+    modified: string;
+    series: string;
+    title: string;
+  };
+  world: {
+    overview: string;
+    history: string;
+  };
+}
+
+// Support Tool Types
+export interface SupportTool {
+  version: string;
+  type: 'support-tool';
+  metadata: {
+    id: string;
+    created: string;
+    modified: string;
+    series: string;
+    title: string;
+  };
+  tool: {
+    name: string;
+    description: string;
+    type: 'tracker' | 'meter' | 'log' | 'map' | 'inventory' | 'custom';
+  };
+}
+
+// Chat Types
+export interface ChatSession {
+  id: string;
+  title: string;
+  series: string;
+  protagonist_id: string;
+  lorebook_id: string;
+  created_at: string;
+  modified_at: string;
+  is_favorite: boolean;
+  folder: string | null;
+  settings: {
+    model: string;
+    temperature: number;
+    max_tokens: number;
+    narrator_prompt: string;
+    system_prompt: string;
+    theme_id: string | null;
+  };
+}
+
+export interface ChatMessage {
+  id: string;
+  session_id: string;
+  type: 'system' | 'narrator' | 'protagonist' | 'npc' | 'ooc';
+  sender_id: string | null;
+  sender_name: string;
+  content: string;
+  timestamp: string;
+}
+
+export interface ToolState {
+  id: string;
+  session_id: string;
+  tool_id: string;
+  message_id: string | null;
+  state: Record<string, any>;
+  timestamp: string;
+}
+
+// Theme Types
+export interface Theme {
+  version: string;
+  type: 'theme';
+  metadata: {
+    id: string;
+    created: string;
+    modified: string;
+    name: string;
+    author: string;
+    description: string;
+  };
+}
+
+// API Config Types
+export interface GeminiConfig {
+  model: string;
+  temperature: number;
+  topK: number;
+  topP: number;
+  maxOutputTokens: number;
+  stopSequences: string[];
+}
+
+export interface OpenRouterConfig {
+  model: string;
+  temperature: number;
+  top_p: number;
+  top_k: number;
+  max_tokens: number;
+  stop: string[];
+}
+
+// Series Type
+export interface Series {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string;
+  modified_at: string;
+}
+
+// Setting Type
+export interface Setting {
+  key: string;
+  value: string;
+  category: string;
+}
+
+// Export Character as an alias of CharacterCard
+export type Character = CharacterCard;
+
+// Export LorebookEntry type
+export interface LorebookEntry {
+  id: string;
+  name: string;
+  content: string;
+  keywords: string[];
+  priority: number;
+  enabled: boolean;
+}
+
+// Export CharacterAttribute type
+export interface CharacterAttribute {
+  name: string;
+  value: number;
+  max?: number;
+  description?: string;
+}
+
+// Export CharacterRelationship type
+export interface CharacterRelationship {
+  character_id: string;
+  name: string;
+  relationship: string;
+  dynamics: string;
+}

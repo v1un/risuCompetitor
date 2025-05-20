@@ -1,7 +1,8 @@
 import { ipcMain } from 'electron';
 import axios from 'axios';
 import { getApiKey } from '../services/api-key-manager';
-import { apiErrorHandler } from './ApiErrorHandler';
+import { apiErrorHandler, createErrorResponse } from './ApiErrorHandler';
+import { API_ENDPOINTS } from '../../shared/config';
 
 // Types
 export interface OpenRouterConfig {
@@ -29,12 +30,8 @@ export function setupOpenRouterService(): void {
       return { success: true, models };
     } catch (error: unknown) {
       console.error('Error fetching OpenRouter models:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'openrouter:get-models');
     }
   });
   
@@ -47,12 +44,8 @@ export function setupOpenRouterService(): void {
       return { success: true, response };
     } catch (error: unknown) {
       console.error('Error generating content with OpenRouter:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'openrouter:generate', { prompt, context });
     }
   });
   
@@ -65,12 +58,8 @@ export function setupOpenRouterService(): void {
       return { success: true, ...result };
     } catch (error: unknown) {
       console.error('Error generating content with history:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      return {
-        success: false,
-        error: errorMessage,
-        details: error
-      };
+      // Use the centralized error handler to create a standardized error response
+      return createErrorResponse(error, 'openrouter:generate-with-history', { history, newPrompt });
     }
   });
 }
@@ -84,7 +73,7 @@ async function initializeOpenRouterClient() {
   }
   
   return axios.create({
-    baseURL: 'https://openrouter.ai/api/v1',
+    baseURL: API_ENDPOINTS.OPENROUTER.BASE_URL,
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'HTTP-Referer': 'http://localhost:3000', // Replace with your app's URL in production
@@ -96,7 +85,7 @@ async function initializeOpenRouterClient() {
 // Get available models
 export async function getAvailableModels() {
   const client = await initializeOpenRouterClient();
-  const response = await client.get('/models');
+  const response = await client.get(API_ENDPOINTS.OPENROUTER.MODELS);
   return response.data.data;
 }
 
@@ -104,7 +93,7 @@ export async function getAvailableModels() {
 export async function generateWithOpenRouter(prompt: string, context: string, config: OpenRouterConfig): Promise<string> {
   const client = await initializeOpenRouterClient();
   
-  const response = await client.post('/chat/completions', {
+  const response = await client.post(API_ENDPOINTS.OPENROUTER.CHAT_COMPLETIONS, {
     model: config.model,
     messages: [
       { role: 'system', content: context },
@@ -130,7 +119,7 @@ export async function generateWithHistoryOpenRouter(history: OpenRouterMessage[]
     { role: 'user', content: newPrompt }
   ];
   
-  const response = await client.post('/chat/completions', {
+  const response = await client.post(API_ENDPOINTS.OPENROUTER.CHAT_COMPLETIONS, {
     model: config.model,
     messages: updatedHistory,
     temperature: config.temperature,

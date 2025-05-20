@@ -189,7 +189,7 @@ export interface AttackRoll extends DiceRoll {
   attackBonus: number;
   targetAC: number;
   hit: boolean;
-  critical: boolean;
+  isCriticalHit: boolean; // Renamed from 'critical' to avoid type conflict with DiceRoll.critical
   damageRolls?: DamageRoll[];
 }
 
@@ -225,7 +225,7 @@ export interface CombatState {
   settings: CombatSettings;
 }
 
-export interface CombatAction {
+export interface CombatActionDispatch {
   type: 'START_COMBAT' | 'END_COMBAT' | 'NEXT_TURN' | 'PREVIOUS_TURN' | 'ADD_PARTICIPANT' | 
     'REMOVE_PARTICIPANT' | 'UPDATE_PARTICIPANT' | 'ROLL_INITIATIVE' | 'SET_INITIATIVE' | 
     'ADD_CONDITION' | 'REMOVE_CONDITION' | 'PERFORM_ACTION' | 'MOVE_PARTICIPANT' | 

@@ -86,7 +86,14 @@ export const KeyboardShortcutProvider: React.FC<KeyboardShortcutProviderProps> =
     }
   }, [shortcuts]);
 
-  // Handle keyboard events
+  // Handle keyboard events - using useRef to avoid dependency on shortcuts
+  const shortcutsRef = React.useRef(shortcuts);
+  
+  // Keep the ref updated with the latest shortcuts
+  React.useEffect(() => {
+    shortcutsRef.current = shortcuts;
+  }, [shortcuts]);
+  
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
     const keyCombination: KeyCombination = {
       key: event.key.toLowerCase(),
@@ -96,8 +103,9 @@ export const KeyboardShortcutProvider: React.FC<KeyboardShortcutProviderProps> =
       metaKey: event.metaKey,
     };
 
-    // Find matching shortcuts
-    const matchingShortcuts = shortcuts.filter(shortcut => {
+    // Use the current shortcuts from ref to avoid dependency issues
+    const currentShortcuts = shortcutsRef.current;
+    const matchingShortcuts = currentShortcuts.filter(shortcut => {
       if (shortcut.disabled) return false;
       
       const keyMatches = shortcut.key.toLowerCase() === keyCombination.key;
@@ -116,15 +124,17 @@ export const KeyboardShortcutProvider: React.FC<KeyboardShortcutProviderProps> =
       }
       shortcut.action();
     });
-  }, [shortcuts]);
+  }, []); // Empty dependency array since we're using the ref for shortcuts
 
   // Set up and clean up event listeners
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    // Create a stable reference to the handler
+    const handler = (e: KeyboardEvent) => handleKeyDown(e);
+    window.addEventListener('keydown', handler);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handler);
     };
-  }, [handleKeyDown]);
+  }, []); // Empty dependency array since handleKeyDown has no dependencies
 
   const contextValue: KeyboardShortcutContextValue = {
     shortcuts,

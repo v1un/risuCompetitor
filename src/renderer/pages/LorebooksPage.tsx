@@ -54,7 +54,7 @@ const LorebooksPage: React.FC = () => {
   useKeyboardShortcut('lorebooks-new', 'n', () => handleNewLorebook(), {
     ctrlKey: true,
     description: 'Create new lorebook',
-    category: 'lorebooks',
+    category: 'lorebook',
     preventDefault: true
   });
   
@@ -63,7 +63,7 @@ const LorebooksPage: React.FC = () => {
   }, {
     ctrlKey: true,
     description: 'Search lorebooks',
-    category: 'lorebooks',
+    category: 'lorebook',
     preventDefault: true
   });
   

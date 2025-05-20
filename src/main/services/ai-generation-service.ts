@@ -150,7 +150,14 @@ The character should feel authentic to the series and have depth and nuance.
                     [null, jsonResponse];
   
   const jsonString = jsonMatch[1];
-  const characterCard = JSON.parse(jsonString);
+  
+  let characterCard;
+  try {
+    characterCard = JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Failed to parse character JSON:', error);
+    throw new Error('Generated character data is not valid JSON. Please try again.');
+  }
   
   // Generate a proper ID if not present
   if (!characterCard.metadata.id || characterCard.metadata.id === "unique-id") {
@@ -272,7 +279,14 @@ The lorebook should provide a solid foundation for an immersive RPG experience s
                     [null, jsonResponse];
   
   const jsonString = jsonMatch[1];
-  const lorebook = JSON.parse(jsonString);
+  
+  let lorebook;
+  try {
+    lorebook = JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Failed to parse lorebook JSON:', error);
+    throw new Error('Generated lorebook data is not valid JSON. Please try again.');
+  }
   
   // Generate a proper ID if not present
   if (!lorebook.metadata.id || lorebook.metadata.id === "unique-id") {
@@ -679,7 +693,7 @@ Always end your response with a hook, question, or situation that invites the pr
             LIMIT 1
           `, sessionId, tool.id);
           
-          let currentState;
+          let currentState: Record<string, any>;
           if (latestState) {
             currentState = JSON.parse(latestState.state);
           } else {
@@ -691,8 +705,8 @@ Always end your response with a hook, question, or situation that invites the pr
           }
           
           // Update the state
-          const newState = { ...currentState };
-          const changes = {};
+          const newState: Record<string, any> = { ...currentState };
+          const changes: Record<string, any> = {};
           
           if (update.type === 'update') {
             newState[update.componentId] = update.value;

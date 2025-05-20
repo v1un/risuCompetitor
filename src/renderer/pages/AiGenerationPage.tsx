@@ -17,10 +17,7 @@ const AiGenerationPage: React.FC = () => {
         
         // Check if API key exists
         const geminiKeyResponse = await window.api.apiKey.exists('gemini');
-        
-        if (geminiKeyResponse.success) {
-          setApiKeyExists(geminiKeyResponse.exists);
-        }
+        setApiKeyExists(geminiKeyResponse.exists);
         
         // Load series
         const seriesResponse = await window.api.series.getAll();
