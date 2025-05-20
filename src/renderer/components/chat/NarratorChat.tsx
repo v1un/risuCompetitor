@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { 
   Box, 
   IconButton, 
@@ -12,6 +11,7 @@ import {
   Typography,
   CircularProgress
 } from '@mui/material';
+import MarkdownMessage, { MessageType } from './MarkdownMessage';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -312,8 +312,13 @@ const NarratorChat: React.FC<NarratorChatProps> = ({
                 </Box>
               )}
             </div>
-            <div className="message-content markdown-content">
-              <ReactMarkdown>{message.content.text}</ReactMarkdown>
+            <div className="message-content">
+              <MarkdownMessage 
+                content={message.content.text}
+                type={message.type as MessageType}
+                author={message.sender.name}
+                timestamp={new Date(message.timestamp)}
+              />
             </div>
           </div>
         ))}

@@ -99,6 +99,14 @@ interface Window {
       delete: (id: string) => Promise<any>;
     };
     
+    // Inventory and Items
+    inventory: {
+      getItems: () => Promise<{ success: boolean; items: Record<string, any>; error?: string }>;
+      getLootTables: () => Promise<{ success: boolean; lootTables: Record<string, any>; error?: string }>;
+      getInventory: (characterId: string) => Promise<{ success: boolean; inventory: any; error?: string }>;
+      saveInventory: (inventory: any) => Promise<{ success: boolean; error?: string }>;
+    };
+    
     // AI Generation
     ai: {
       generateCharacter: (series: string, role: string, additionalInfo?: string) => Promise<any>;

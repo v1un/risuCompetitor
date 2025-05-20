@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import MarkdownEditor from '../common/MarkdownEditor';
+import MarkdownMessage from '../chat/MarkdownMessage';
+import { Box, Typography, Button, Select, MenuItem, FormControl, InputLabel, Paper, CircularProgress, Alert } from '@mui/material';
 
 interface AiGenerationPanelProps {
   series: string;
@@ -99,17 +102,20 @@ const AiGenerationPanel: React.FC<AiGenerationPanelProps> = ({ series }) => {
         </div>
       )}
       
-      <div className="form-group">
-        <label htmlFor="additionalInfo">Additional Information (Optional)</label>
-        <textarea 
-          id="additionalInfo" 
-          value={additionalInfo} 
-          onChange={(e) => setAdditionalInfo(e.target.value)}
-          disabled={generating}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="subtitle1" gutterBottom>
+          Additional Information (Optional)
+        </Typography>
+        <MarkdownEditor
+          value={additionalInfo}
+          onChange={setAdditionalInfo}
           placeholder="Add any specific requirements or details you want the AI to consider..."
-          rows={4}
+          minHeight={150}
+          label="Additional Information"
+          error={false}
+          autoFocus={false}
         />
-      </div>
+      </Box>
       
       <button 
         onClick={handleGenerate} 
@@ -130,53 +136,90 @@ const AiGenerationPanel: React.FC<AiGenerationPanelProps> = ({ series }) => {
           <h3>Generation Result</h3>
           
           {generationType === 'character' && result.character && (
-            <div className="character-result">
-              <h4>{result.character.character.name}</h4>
-              <p><strong>Role:</strong> {result.character.character.role}</p>
-              <p><strong>Description:</strong> {result.character.character.description}</p>
-              <button 
+            <Paper sx={{ p: 2, mb: 2 }}>
+              <Typography variant="h5" gutterBottom>
+                {result.character.character.name}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>Role:</strong> {result.character.character.role}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>Description:</strong>
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <MarkdownMessage 
+                  content={result.character.character.description}
+                  type="system"
+                />
+              </Box>
+              <Button 
+                variant="contained"
+                color="primary"
                 onClick={() => {
                   // Save to database
                   window.api.character.create(result.character);
                 }}
-                className="secondary-button"
               >
                 Save Character
-              </button>
-            </div>
+              </Button>
+            </Paper>
           )}
           
           {generationType === 'lorebook' && result.lorebook && (
-            <div className="lorebook-result">
-              <h4>{result.lorebook.metadata.title}</h4>
-              <p><strong>Overview:</strong> {result.lorebook.world.overview}</p>
-              <button 
+            <Paper sx={{ p: 2, mb: 2 }}>
+              <Typography variant="h5" gutterBottom>
+                {result.lorebook.metadata.title}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>Overview:</strong>
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <MarkdownMessage 
+                  content={result.lorebook.world.overview}
+                  type="system"
+                />
+              </Box>
+              <Button 
+                variant="contained"
+                color="primary"
                 onClick={() => {
                   // Save to database
                   window.api.lorebook.create(result.lorebook);
                 }}
-                className="secondary-button"
               >
                 Save Lorebook
-              </button>
-            </div>
+              </Button>
+            </Paper>
           )}
           
           {generationType === 'supportTool' && result.tool && (
-            <div className="tool-result">
-              <h4>{result.tool.tool.name}</h4>
-              <p><strong>Type:</strong> {result.tool.tool.type}</p>
-              <p><strong>Description:</strong> {result.tool.tool.description}</p>
-              <button 
+            <Paper sx={{ p: 2, mb: 2 }}>
+              <Typography variant="h5" gutterBottom>
+                {result.tool.tool.name}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>Type:</strong> {result.tool.tool.type}
+              </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>Description:</strong>
+              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <MarkdownMessage 
+                  content={result.tool.tool.description}
+                  type="system"
+                />
+              </Box>
+              <Button 
+                variant="contained"
+                color="primary"
                 onClick={() => {
                   // Save to database
                   window.api.supportTool.create(result.tool);
                 }}
-                className="secondary-button"
               >
                 Save Support Tool
-              </button>
-            </div>
+              </Button>
+            </Paper>
           )}
           
           <details>

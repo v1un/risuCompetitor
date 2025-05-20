@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import { getDatabase } from '../database/sqlite';
 import { v4 as uuidv4 } from 'uuid';
+import { setupInventoryHandlers } from './inventory-handlers';
 
 // Define types for database entities
 interface Character {
@@ -100,6 +101,9 @@ export function setupApiHandlers(): void {
   
   // Series handlers
   setupSeriesHandlers();
+  
+  // Inventory handlers
+  setupInventoryHandlers();
 }
 
 // Character handlers

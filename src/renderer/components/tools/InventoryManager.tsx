@@ -246,12 +246,6 @@ const InventoryManager: React.FC<InventoryManagerProps> = ({
       prev.map(item => {
         if (item.id === id) {
           const newQuantity = Math.max(0, item.quantity + change);
-          
-          // If quantity becomes 0, remove the item
-          if (newQuantity === 0) {
-            return item;
-          }
-          
           return {
             ...item,
             quantity: newQuantity
