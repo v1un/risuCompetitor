@@ -5,13 +5,7 @@ import {
   Select, 
   MenuItem, 
   FormHelperText,
-  CircularProgress,
-  Typography,
-  Box,
-  Tabs,
-  Tab,
   Slider,
-  TextField,
   SelectChangeEvent
 } from '@mui/material';
 
